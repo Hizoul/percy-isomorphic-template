@@ -1,0 +1,95 @@
+[tasks.client]
+script_runner = "@shell"
+script = [
+'''
+cd client
+rm -rf build
+mkdir -p build
+wasm-pack build --dev --target web --no-typescript --out-dir ./build
+'''
+]
+
+[tasks.dev-client]
+script_runner = "@shell"
+script = [
+'''
+watchexec -w client/src -w app/src -e rs -r cargo make client
+'''
+]
+
+[tasks.build]
+dependencies = ["build-client", "build-server"]
+
+[tasks.run-release]
+script_runner = "@shell"
+script = [
+'''
+
+'''
+]
+[tasks.build-client]
+script_runner = "@shell"
+script = [
+'''
+cd client
+rm -rf dist/
+mkdir -p dist/
+wasm-pack build --target web --no-typescript --out-dir ./dist --release
+'''
+]
+[tasks.build-server]
+script_runner = "@shell"
+script = [
+'''
+cd server
+OUTPUT_CSS="$(pwd)/../client/dist/app.css" cargo build --release
+'''
+]
+
+[tasks.release]
+dependencies = ["build-client", "build-server"]
+script_runner = "@shell"
+script = [
+'''
+cd server
+OUTPUT_CSS="$(pwd)/../client/dist/app.css" cargo run --release
+'''
+]
+
+[tasks.server]
+script_runner = "@shell"
+script = [
+'''
+cd server
+OUTPUT_CSS="$(pwd)/../client/build/app.css" cargo run
+'''
+]
+
+
+[tasks.dev-server]
+script_runner = "@shell"
+script = [
+'''
+cd server
+watchexec -w server/src -w app/src -e rs -r cargo make server
+'''
+]
+
+[tasks.dev-parallel]
+script_runner = "@shell"
+script = [
+'''
+cargo make client &  PIDCLIENT=$!
+cargo make server &  PIDSERVER=$!
+wait $PIDCLIENT
+wait $PIDSERVER
+'''
+]
+
+[tasks.dev]
+script_runner = "@shell"
+script = [
+'''
+watchexec -w app/src -w client/src -w server/src -e rs -r cargo make dev-parallel
+'''
+]
