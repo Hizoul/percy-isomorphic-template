@@ -1,0 +1,11 @@
+[package]
+name = "isomorphic-prerender"
+version = "0.1.0"
+authors = ["Matthias Müller-Brockhausen <publicgit@mmb2.click>"]
+publish = false
+edition = "2018"
+
+[dependencies]
+isomorphic-app = { path = "../app" }
+virtual-dom-rs = "0.6"
+html-minifier = "1.1"

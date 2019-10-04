@@ -93,3 +93,11 @@ script = [
 watchexec -w app/src -w client/src -w server/src -e rs -r cargo make dev-parallel
 '''
 ]
+[tasks.prerender]
+script_runner = "@shell"
+script = [
+'''
+cd prerender
+cargo run
+'''
+]
