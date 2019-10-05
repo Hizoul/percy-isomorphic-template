@@ -17,7 +17,7 @@ mod views;
 
 pub struct App {
     pub store: Rc<RefCell<Store>>,
-    router: Rc<Router>,
+    pub router: Rc<Router>,
 }
 
 impl App {

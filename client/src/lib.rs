@@ -12,10 +12,11 @@ use wasm_bindgen::JsCast;
 use web_sys;
 use web_sys::Url;
 use std::sync::{Mutex, Arc};
+use router_rs::prelude::*;
 
 pub struct Client {
-    app: App,
-    dom_updater: DomUpdater,
+    pub app: App,
+    pub dom_updater: DomUpdater,
 }
 
 #[wasm_bindgen]
@@ -33,10 +34,8 @@ impl Renderer {
             let sub = locked_client.clone();
             let mut borrowed_store = unlocked_client.app.store.borrow_mut();
             let mut a = Arc::new(Closure::wrap(Box::new(move || {
-                web_sys::console::log_1(&"updating ui in animation frame".into());
                 let mut unlocked_client = sub.lock().unwrap();
                 unlocked_client.render();
-                web_sys::console::log_1(&"rerendered".into());
             }) as Box<dyn Fn()>));
             borrowed_store.subscribe(Box::new(move || {
                 window().request_animation_frame((*a).as_ref().unchecked_ref());
@@ -80,7 +79,8 @@ impl Client {
         let dom_updater = DomUpdater::new_replace_mount(app.render(), root_node);
 
         let store = Rc::clone(&app.store);
-        intercept_relative_links(store);
+        let router = Rc::clone(&app.router);
+        intercept_relative_links(store, router);
 
         Client { app, dom_updater }
     }
@@ -93,7 +93,7 @@ impl Client {
 
 // Ensure that anytime a link such as `<a href="/foo" />` is clicked we re-render the page locally
 // instead of hitting the server to load a new page.
-fn intercept_relative_links(store: Rc<RefCell<Store>>) {
+fn intercept_relative_links(store: Rc<RefCell<Store>>, router: Rc<Router>) {
     let on_anchor_click = move |event: web_sys::Event| {
         // Get the tag name of the element that was clicked
         let target = event
@@ -107,17 +107,24 @@ fn intercept_relative_links(store: Rc<RefCell<Store>>) {
         // If the clicked element is an anchor tag, check if it points to the current website
         // (ex: '<a href="/some-page"></a>'
         if tag_name.to_lowercase() == "a" {
-            let link = Reflect::get(&target, &"href".into())
-                .unwrap()
-                .as_string()
-                .unwrap();
-            let link_url = Url::new(link.as_str()).unwrap();
-            // If this was indeed a relative URL, let our single page application router
-            // handle it
-            if link_url.hostname() == hostname() && link_url.port() == port() {
-                event.prevent_default();
-                let msg = &Msg::SetPath(link_url.pathname());
-                store.borrow_mut().msg(msg);
+            let link = Reflect::get(&target, &"href".into());
+            if link.is_ok() {
+                let link_url_getter = Url::new(link.unwrap()
+                    .as_string()
+                    .unwrap().as_str());
+                if link_url_getter.is_ok() {
+                    let link_url = link_url_getter.unwrap();
+                    // If this was indeed a relative URL, let our single page application router
+                    // handle it
+                    if link_url.hostname() == hostname() && link_url.port() == port() {
+                        let pathname = link_url.pathname();
+                        if router.matching_routerhandler(pathname.as_str()).is_some() {
+                            event.prevent_default();
+                            let msg = &Msg::SetPath(pathname);
+                            store.borrow_mut().msg(msg);
+                        }
+                    }
+                }
             }
         }
     };

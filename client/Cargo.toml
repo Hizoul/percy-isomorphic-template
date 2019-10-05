@@ -14,6 +14,7 @@ isomorphic-app = { path = "../app" }
 js-sys = "0.3"
 log = "0.4.6"
 virtual-dom-rs = "0.6"
+router-rs = "0.2"
 
 [dependencies.wasm-bindgen]
 version = "0.2.45"
