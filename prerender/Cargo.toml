@@ -9,3 +9,4 @@ edition = "2018"
 isomorphic-app = { path = "../app" }
 virtual-dom-rs = "0.6"
 html-minifier = "1.1"
+router-rs = "0.2"

@@ -1,0 +1,12 @@
+[package]
+name = "isomorphic-percy"
+version = "0.1.0"
+authors = ["Matthias Müller-Brockhausen <publicgit@mmb2.click>"]
+publish = false
+edition = "2018"
+
+[workspace]
+members = [
+  "app", "client", "prerender", "server"
+]
+

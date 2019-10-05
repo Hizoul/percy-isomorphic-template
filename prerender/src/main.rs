@@ -5,5 +5,6 @@ use isomorphic_prerender::prerender_app_to;
 
 fn main() {
     prerender_app_to("/", "../client/dist/index.html").unwrap();
+    prerender_app_to("/projects.html", "../client/dist/projects.html").unwrap();
     println!("prerendered to ../client/dist/index.html. edit this to prerender more.");
 }

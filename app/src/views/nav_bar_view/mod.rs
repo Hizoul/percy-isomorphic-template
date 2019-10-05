@@ -21,10 +21,12 @@ pub enum ActivePage {
 
 impl View for NavBarView {
     fn render(&self) -> VirtualNode {
-        let home = NavBarItemView::new("/", "Isomorphic Web App", "");
+        let home = NavBarItemView::new("/", "Home", "");
+        let projects = NavBarItemView::new("/projects.html", "Projects", "");
         html! {
             <div class=NAV_BAR_CSS>
                 { home.render() }
+                { projects.render() }
             </div>
         }
     }

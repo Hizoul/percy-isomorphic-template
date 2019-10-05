@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="/static/app.css"/>
+    <link rel="stylesheet" type="text/css" href="/app.css"/>
     <link rel="shortcut icon" href="#" />
     <title>Rust Web App</title>
 </head>
@@ -12,36 +12,13 @@
       #HTML_INSERTED_HERE_BY_SERVER#
   </div>
   <script type=module>
-    let client
-    let updateScheduled = false
-
-    window.GlobalJS = function () {}
-    // TODO:
-    // https://rustwasm.github.io/wasm-bindgen/api/web_sys/struct.Window.html#method.request_animation_frame
-    window.GlobalJS.prototype.update = function () {
-      if (!updateScheduled) {
-        requestAnimationFrame(() => {
-          client.render();
-          updateScheduled = false
-        })
-      }
-
-      updateScheduled = true
-    }
-    window.global_js = new GlobalJS()
-
-    import { Client, default as init } from '/static/isomorphic_client.js';
-
+    let renderer
+    import { Renderer, default as init } from '/isomorphic_client.js';
     async function run() {
-      await init('/static/isomorphic_client_bg.wasm');
-
-      client = new Client(window.initialState)
+      await init('/isomorphic_client_bg.wasm');
+      renderer = new Renderer('#INITIAL_STATE_JSON#')
     }
-
     run();
-  </script>
-  <script>
-      window.initialState = '#INITIAL_STATE_JSON#'
   </script>
 </body>
 </html>

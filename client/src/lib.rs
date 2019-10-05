@@ -3,7 +3,6 @@ use isomorphic_app;
 use isomorphic_app::Msg;
 use isomorphic_app::{App, Store};
 use js_sys::Reflect;
-use log::Level;
 use std::cell::RefCell;
 use std::rc::Rc;
 use virtual_dom_rs::prelude::*;
@@ -12,46 +11,52 @@ use wasm_bindgen::prelude::*;
 use wasm_bindgen::JsCast;
 use web_sys;
 use web_sys::Url;
+use std::sync::{Mutex, Arc};
 
-#[wasm_bindgen]
 pub struct Client {
     app: App,
     dom_updater: DomUpdater,
 }
 
-// Expose globals from JS for things such as request animation frame
-// that web sys doesn't seem to have yet
-//
-// TODO: Remove this and use RAF from Rust
-// https://rustwasm.github.io/wasm-bindgen/api/web_sys/struct.Window.html#method.request_animation_frame
 #[wasm_bindgen]
-extern "C" {
-    pub type GlobalJS;
-
-    pub static global_js: GlobalJS;
-
-    #[wasm_bindgen(method)]
-    pub fn update(this: &GlobalJS);
+pub struct Renderer {
+    client: Arc<Mutex<Client>>
+}
+#[wasm_bindgen]
+impl Renderer {
+    #[wasm_bindgen(constructor)]
+    pub fn new(initial_state: &str) -> Renderer {
+        let client = Client::new(initial_state);
+        let locked_client = Arc::new(Mutex::new(client));
+        {
+            let unlocked_client = locked_client.lock().unwrap();
+            let sub = locked_client.clone();
+            let mut borrowed_store = unlocked_client.app.store.borrow_mut();
+            let mut a = Arc::new(Closure::wrap(Box::new(move || {
+                web_sys::console::log_1(&"updating ui in animation frame".into());
+                let mut unlocked_client = sub.lock().unwrap();
+                unlocked_client.render();
+                web_sys::console::log_1(&"rerendered".into());
+            }) as Box<dyn Fn()>));
+            borrowed_store.subscribe(Box::new(move || {
+                window().request_animation_frame((*a).as_ref().unchecked_ref());
+            }));
+        }
+        {
+            let mut unlocked_client = locked_client.lock().unwrap();
+            unlocked_client.render();
+        }
+        Renderer {
+            client: locked_client
+        }
+    }
 }
 
-#[wasm_bindgen]
 impl Client {
-    #[wasm_bindgen(constructor)]
     pub fn new(initial_state: &str) -> Client {
-        // In a real app you'd typically uncomment this line
-        // #[cfg(debug_assertions)]
-        console_log::init_with_level(Level::Debug);
-
         console_error_panic_hook::set_once();
 
         let app = App::from_state_json(initial_state);
-
-        // TODO: Use request animation frame from web_sys
-        // https://rustwasm.github.io/wasm-bindgen/api/web_sys/struct.Window.html#method.request_animation_frame
-        app.store.borrow_mut().subscribe(Box::new(|| {
-            web_sys::console::log_1(&"Updating state".into());
-            global_js.update();
-        }));
 
         app.store.borrow_mut().set_after_route(Box::new(|new_path| {
             history().push_state_with_url(&JsValue::null(), "Rust Web App", Some(new_path));
@@ -107,12 +112,10 @@ fn intercept_relative_links(store: Rc<RefCell<Store>>) {
                 .as_string()
                 .unwrap();
             let link_url = Url::new(link.as_str()).unwrap();
-
             // If this was indeed a relative URL, let our single page application router
             // handle it
             if link_url.hostname() == hostname() && link_url.port() == port() {
                 event.prevent_default();
-
                 let msg = &Msg::SetPath(link_url.pathname());
                 store.borrow_mut().msg(msg);
             }

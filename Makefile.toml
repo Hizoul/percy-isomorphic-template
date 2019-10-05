@@ -1,3 +1,6 @@
+[config]
+default_to_workspace = false
+
 [tasks.client]
 script_runner = "@shell"
 script = [
@@ -70,34 +73,29 @@ OUTPUT_CSS="$(pwd)/../client/build/app.css" cargo run
 script_runner = "@shell"
 script = [
 '''
-cd server
 watchexec -w server/src -w app/src -e rs -r cargo make server
 '''
 ]
 
 [tasks.dev-parallel]
 script_runner = "@shell"
-script = [
-'''
+script = ['''
 cargo make client &  PIDCLIENT=$!
 cargo make server &  PIDSERVER=$!
 wait $PIDCLIENT
 wait $PIDSERVER
-'''
-]
+''']
 
 [tasks.dev]
 script_runner = "@shell"
-script = [
-'''
+script = ['''
+echo $PWD
 watchexec -w app/src -w client/src -w server/src -e rs -r cargo make dev-parallel
-'''
-]
+''']
+
 [tasks.prerender]
 script_runner = "@shell"
-script = [
-'''
+script = ['''
 cd prerender
 cargo run
-'''
-]
+''']

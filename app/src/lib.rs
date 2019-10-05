@@ -10,11 +10,9 @@ use virtual_dom_rs::prelude::*;
 pub use virtual_dom_rs::VirtualNode;
 use wasm_bindgen;
 use wasm_bindgen::prelude::*;
-use wasm_bindgen::JsCast;
-use wasm_bindgen::JsValue;
 
-mod state;
-mod store;
+pub mod state;
+pub mod store;
 mod views;
 
 pub struct App {
@@ -59,8 +57,12 @@ impl App {
 }
 
 #[route(path = "/")]
-fn home_route(store: Provided<Rc<RefCell<Store>>>) -> VirtualNode {
+pub fn home_route(store: Provided<Rc<RefCell<Store>>>) -> VirtualNode {
     HomeView::new(Rc::clone(&store)).render()
+}
+#[route(path = "/projects.html")]
+pub fn projects_route(store: Provided<Rc<RefCell<Store>>>) -> VirtualNode {
+    ProjectsView::new(Rc::clone(&store)).render()
 }
 
 fn make_router(store: Rc<RefCell<Store>>) -> Rc<Router> {
@@ -68,7 +70,7 @@ fn make_router(store: Rc<RefCell<Store>>) -> Rc<Router> {
 
     router.provide(store);
 
-    router.set_route_handlers(create_routes![home_route]);
+    router.set_route_handlers(create_routes![home_route,projects_route]);
 
     Rc::new(router)
 }
@@ -79,6 +81,6 @@ mod tests {
 
     #[test]
     fn test() {
-        let app = App::new(5, "/".to_string());
+        let app = App::new("/");
     }
 }

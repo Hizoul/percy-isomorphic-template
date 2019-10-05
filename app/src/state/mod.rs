@@ -40,12 +40,11 @@ impl State {
 #[cfg(test)]
 mod tests {
     use super::*;
-
     #[test]
     fn serialize_deserialize() {
-        let state = State::from_json(r#"{path":"/"}"#);
+        let mut state = State::from_json(r#"{path":"/"}"#);
         assert_eq!(state.path(), "/");
-        state.set_path("/test");
+        state.set_path("/test".to_owned());
         assert_eq!(state.path(), "/test");
         assert_eq!(&state.to_json(), r#"{path":"/test"}"#);
     }

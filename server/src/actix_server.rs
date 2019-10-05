@@ -18,7 +18,7 @@ struct RequestQuery {
 ///
 /// localhost:7878/?init=50
 fn index(query: web::Query<RequestQuery>) -> impl Responder {
-    respond("/".to_string())
+    respond(&"/")
 }
 
 /// # Example
@@ -26,10 +26,10 @@ fn index(query: web::Query<RequestQuery>) -> impl Responder {
 /// localhost:7878/contributors?init=1200
 fn catch_all(req: HttpRequest) -> impl Responder {
     let path = web::Path::<String>::extract(&req).unwrap();
-    respond(path.to_string())
+    respond(&path)
 }
 
-fn respond(path: String) -> impl Responder {
+fn respond(path: &str) -> impl Responder {
     let app = App::new(path);
     let state = app.store.borrow();
 
