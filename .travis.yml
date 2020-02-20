@@ -1,4 +1,5 @@
 language: rust
 script:
+  - cargo install wasm-pack
   - cargo build --verbose --all
   - cargo test --verbose --all
