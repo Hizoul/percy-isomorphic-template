@@ -95,6 +95,7 @@ watchexec -w app/src -w client/src -w server/src -e rs -r cargo make dev-paralle
 
 [tasks.prerender]
 script_runner = "@shell"
+dependencies = ["build-client"]
 script = ['''
 cd prerender
 cargo run
