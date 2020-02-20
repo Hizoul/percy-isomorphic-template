@@ -24,7 +24,7 @@ Scripts are invoked via `cargo make <scriptName>` or `makers <scriptName>`
 | `dev` | Automatically rebuild client and start the server on any change to the sources |
 | `build` | Builds the release version of the client and the server |
 | `release` | Run the release version of the server and builds release client |
-| `prerender` | Prerenders all routes and build the production version of the client. The result from `prerender` can be hosted through any static file host. |
+| `prerender` | Prerenders all routes and build the production version of the client. The result from `prerender` can be hosted through any static file host (e.g. github pages). |
 
 # Prerendering
 Prerendering doesn't happen automagically like in `preact-cli`, `gatsby` or `react-static`.
