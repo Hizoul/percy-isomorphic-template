@@ -1,10 +1,14 @@
-use isomorphic_app::App;
-use html_minifier::HTMLMinifier;
-use std::fs::write;
 use isomorphic_prerender::prerender_app_to;
 
 fn main() {
-    prerender_app_to("/", "../client/dist/index.html").unwrap();
-    prerender_app_to("/projects.html", "../client/dist/projects.html").unwrap();
-    println!("prerendered to ../client/dist/index.html. edit this to prerender more.");
+    let target = "../client/dist/";
+    let routes = vec![
+        ("/", "index.html"),
+        ("/projects.html", "projects.html")
+    ];
+    for rout in routes {
+        prerender_app_to(rout.0, format!("{}{}", target, rout.1).as_str()).unwrap();
+        println!("rendered {:?}", rout);
+    }
+    println!("edit the routes vector in prerender/src/main.rs to add or remove routes");
 }
