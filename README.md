@@ -1,4 +1,4 @@
-# Percy Isomorphic Template [![Build Status](https://travis-ci.org/Hizoul/resub-persist.svg?branch=master)](https://travis-ci.org/Hizoul/optikey-boardlayout)
+# Percy Isomorphic Template
 This repository contains a stripped-down version of the [official isomorphic percy example](https://github.com/chinedufn/percy/tree/master/examples/isomorphic).
 Linux bash scripts were converted to `cargo-make` shell commands so that they are [runnable across platforms](https://sagiegurari.github.io/cargo-make/#usage-task-command-script-task-exampleshell2batch).
 Furthermore, a `prerender` script has been added to enable client-only applications. Thus everything can be prerendered with data for faster load times and search indexability and the `server`-crate becomes optional.
