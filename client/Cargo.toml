@@ -9,15 +9,15 @@ crate-type = ["cdylib"]
 
 [dependencies]
 console_error_panic_hook = "0.1"
-console_log = "0.1.2"
+console_log = "0.1"
 isomorphic-app = { path = "../app" }
 js-sys = "0.3"
-log = "0.4.6"
+log = "0.4"
 virtual-dom-rs = "0.6"
 router-rs = "0.2"
 
 [dependencies.wasm-bindgen]
-version = "0.2.45"
+version = "0.2"
 features = ["default", "nightly"]
 
 [dependencies.web-sys]

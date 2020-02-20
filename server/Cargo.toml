@@ -10,9 +10,9 @@ default = ["with-actix"]
 with-actix = ["actix-web", "actix-files", "actix-rt", "serde"]
 
 [dependencies]
-chrono = "0.4.6"
+chrono = "0.4"
 isomorphic-app = { path = "../app" }
-env_logger = "0.6.1"
+env_logger = "0.7"
 virtual-dom-rs = "0.6"
 
 # with-actix
